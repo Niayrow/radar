@@ -1,6 +1,6 @@
 import React from "react";
 import { getWMOInfo, getDailyForecasts, WeatherTheme, WeatherData } from "../utils/weatherUtils";
-import { Calendar, Navigation } from "lucide-react";
+import { Calendar } from "lucide-react";
 import { motion } from "framer-motion";
 
 interface DailyForecastsListProps {
@@ -124,17 +124,6 @@ export default function DailyForecastsList({
                     className={`h-full rounded-full ${rBarColor} opacity-80`}
                   />
                 </div>
-              </div>
-
-              {/* ── Wind ─────────────────────────────── */}
-              <div className="flex items-center gap-1 w-[52px] justify-end shrink-0">
-                <Navigation
-                  className="w-2.5 h-2.5 text-cyan-400/70 shrink-0"
-                  style={{ transform: `rotate(${day.windDirection}deg)` }}
-                />
-                <span className="text-[9px] font-semibold text-white/40 tabular-nums">
-                  {Math.round(day.windSpeed)}
-                </span>
               </div>
             </motion.div>
           );
