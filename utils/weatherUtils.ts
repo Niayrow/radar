@@ -190,11 +190,14 @@ export function getWeatherTheme(code: number, temp: number): WeatherTheme {
 export interface DailyForecast {
   date: string;
   dayLabel: string;
+  fullDateLabel: string;
   maxTemp: number;
   minTemp: number;
   weatherCode: number;
   windSpeed: number;
   windDirection: number;
+  /** Forecast reliability in % — decreases with forecast distance */
+  reliability: number;
 }
 
 export function getDailyForecasts(hourly: WeatherData["hourly"]): DailyForecast[] {
@@ -207,10 +210,10 @@ export function getDailyForecasts(hourly: WeatherData["hourly"]): DailyForecast[
     }
     daysMap[dateStr].push(item);
   });
-  
+
   const daysKeys = Object.keys(daysMap).sort();
-  
-  return daysKeys.slice(0, 10).map((dateKey) => {
+
+  return daysKeys.slice(0, 10).map((dateKey, dayIndex) => {
     const dayData = daysMap[dateKey];
     const temps = dayData.map((d) => d.temperature);
     const maxTemp = Math.max(...temps);
@@ -224,18 +227,28 @@ export function getDailyForecasts(hourly: WeatherData["hourly"]): DailyForecast[
     const windDirection = noonItem ? (Math.round(noonItem.windSpeed * 15) % 360) : 0;
     
     const dateObj = new Date(dateKey + "T00:00:00");
+
+    // Short weekday label (e.g. "Lun")
     const dayLabel = dateObj.toLocaleDateString("fr-FR", { weekday: "short" });
-    // Capitalize first letter and strip dot/format nicely
     const formattedLabel = dayLabel.charAt(0).toUpperCase() + dayLabel.slice(1).replace(".", "");
+
+    // Full date label (e.g. "23 juin")
+    const fullDateLabel = dateObj.toLocaleDateString("fr-FR", { day: "numeric", month: "short" });
+
+    // Meteorological reliability: ~95% for today, decays to ~40% by day 10
+    // Formula: 95 - dayIndex * 6, floored at 40
+    const reliability = Math.max(40, 95 - dayIndex * 6);
 
     return {
       date: dateKey,
       dayLabel: formattedLabel,
+      fullDateLabel,
       maxTemp,
       minTemp,
       weatherCode,
       windSpeed,
       windDirection,
+      reliability,
     };
   });
 }

@@ -19,7 +19,7 @@ import {
   LocateFixed,
 } from "lucide-react";
 import { useWeatherTheme } from "../hooks/useWeatherTheme";
-import { getWMOInfo, WeatherData } from "../utils/weatherUtils";
+import { getWMOInfo, getDailyForecasts, WeatherData } from "../utils/weatherUtils";
 import HourlyForecast from "./HourlyForecast";
 import WeatherChart from "./WeatherChart";
 import BentoGridMetrics from "./BentoGridMetrics";
@@ -326,6 +326,38 @@ export default function WeatherDashboard() {
 
   const currentWmo = weatherData ? getWMOInfo(weatherData.current.weatherCode) : null;
   const CurrentIcon = currentWmo?.icon || CloudSun;
+
+  // Helper to format selected day label for the modal title
+  const getFormattedSelectedDayLabel = () => {
+    if (!selectedDayDate) return "";
+    try {
+      const d = new Date(selectedDayDate + "T00:00:00");
+      const label = d.toLocaleDateString("fr-FR", {
+        weekday: "long",
+        day: "numeric",
+        month: "long",
+      });
+      return label.charAt(0).toUpperCase() + label.slice(1);
+    } catch {
+      return "Prévisions horaires";
+    }
+  };
+
+  // Helper to get selected day overview info
+  const getSelectedDayInfo = () => {
+    if (!selectedDayDate || !weatherData) return null;
+    const daily = getDailyForecasts(weatherData.hourly);
+    const day = daily.find((d) => d.date === selectedDayDate);
+    if (!day) return null;
+    const wmo = getWMOInfo(day.weatherCode);
+    return {
+      Icon: wmo.icon,
+      wmoText: wmo.label,
+      maxTemp: day.maxTemp,
+      minTemp: day.minTemp,
+      windSpeed: day.windSpeed,
+    };
+  };
 
   return (
     <div className="min-h-screen w-full relative overflow-y-auto p-4 md:p-8 flex flex-col items-center z-0 pb-28">
@@ -680,8 +712,7 @@ export default function WeatherDashboard() {
                   hourly={weatherData.hourly}
                   theme={theme}
                   timezone={weatherData.timezone}
-                  selectedDayDate={selectedDayDate}
-                  onClearSelection={() => setSelectedDayDate(null)}
+                  selectedDayDate={null}
                 />
 
                 {/* 10-Day Forecast List */}
@@ -690,7 +721,7 @@ export default function WeatherDashboard() {
                   theme={theme}
                   selectedDayDate={selectedDayDate}
                   onSelectDay={(date) => {
-                    setSelectedDayDate((prev) => (prev === date ? null : date));
+                    setSelectedDayDate(date);
                   }}
                 />
               </motion.div>
@@ -840,8 +871,78 @@ export default function WeatherDashboard() {
 
       </div>
 
-      {/* 5. Floating Bottom Navigation Bar */}
-      <div className="fixed bottom-4 left-1/2 -translate-x-1/2 w-[calc(100%-2rem)] max-w-md bg-black/50 border border-white/[0.08] backdrop-blur-3xl rounded-2xl py-3 px-6 shadow-[0_20px_60px_rgba(0,0,0,0.6)] flex items-center justify-around z-50">
+      {/* 6. Hourly Detail Modal for Selected Day */}
+      <AnimatePresence>
+        {selectedDayDate && (() => {
+          const dayInfo = getSelectedDayInfo();
+          return (
+            <div className="fixed inset-0 z-[150] flex items-end md:items-center justify-center p-0 md:p-4">
+              {/* Backdrop */}
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                onClick={() => setSelectedDayDate(null)}
+                className="absolute inset-0 bg-black/75 backdrop-blur-md"
+              />
+              
+              {/* Modal Card Sheet */}
+              <motion.div
+                initial={{ y: "100%", opacity: 0.5 }}
+                animate={{ y: 0, opacity: 1 }}
+                exit={{ y: "100%", opacity: 0.5 }}
+                transition={{ type: "spring", damping: 26, stiffness: 220 }}
+                className="relative w-full max-w-md bg-slate-950/95 border-t md:border border-white/[0.08] backdrop-blur-3xl rounded-t-[32px] md:rounded-[24px] overflow-hidden p-5 shadow-[0_-15px_40px_rgba(0,0,0,0.6)] z-10 flex flex-col gap-4 text-white"
+              >
+                {/* Header */}
+                <div className="flex items-center justify-between border-b border-white/[0.06] pb-3">
+                  <div>
+                    <span className="text-[10px] font-black text-cyan-400 uppercase tracking-widest block mb-0.5">Détails de la journée</span>
+                    <h2 className="text-base font-black tracking-tight">{getFormattedSelectedDayLabel()}</h2>
+                  </div>
+                  <button
+                    onClick={() => setSelectedDayDate(null)}
+                    className="p-2 rounded-full bg-white/5 hover:bg-white/10 active:scale-95 transition-all text-white/50 hover:text-white"
+                  >
+                    <X className="w-4 h-4" />
+                  </button>
+                </div>
+
+                {/* Day Weather Overview card inside modal */}
+                {dayInfo && (
+                  <div className="p-3.5 rounded-2xl bg-white/[0.03] border border-white/[0.05] flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <div className="p-2 rounded-xl bg-white/[0.03] border border-white/[0.05]">
+                        <dayInfo.Icon className={`w-8 h-8 ${theme.accentText}`} />
+                      </div>
+                      <div className="flex flex-col">
+                        <span className="text-xs font-black text-white">{dayInfo.wmoText}</span>
+                        <span className="text-[10px] text-white/40 font-semibold mt-0.5">Vent max: {Math.round(dayInfo.windSpeed)} km/h</span>
+                      </div>
+                    </div>
+                    <div className="text-right flex flex-col gap-0.5">
+                      <span className="text-base font-black text-white">{Math.round(dayInfo.maxTemp)}°C</span>
+                      <span className="text-[10px] font-semibold text-white/30">Min: {Math.round(dayInfo.minTemp)}°C</span>
+                    </div>
+                  </div>
+                )}
+
+                {/* Scrollable Hourly forecast list */}
+                <HourlyForecast
+                  hourly={weatherData.hourly}
+                  theme={theme}
+                  timezone={weatherData.timezone}
+                  selectedDayDate={selectedDayDate}
+                  onClearSelection={() => setSelectedDayDate(null)}
+                />
+              </motion.div>
+            </div>
+          );
+        })()}
+      </AnimatePresence>
+
+      {/* 5. Floating Bottom Navigation Bar (Fixed on Mobile, In-flow on PC) */}
+      <div className="fixed bottom-4 left-1/2 -translate-x-1/2 w-[calc(100%-2rem)] max-w-md bg-black/50 border border-white/[0.08] backdrop-blur-3xl rounded-2xl py-3 px-6 shadow-[0_20px_60px_rgba(0,0,0,0.6)] flex items-center justify-around z-50 md:relative md:bottom-0 md:left-0 md:translate-x-0 md:w-full md:mt-8 md:mb-2 md:z-10">
         {([
           { id: "today",    icon: Home,     label: "Aujourd'hui" },
           { id: "forecast", icon: Calendar,  label: "Prévisions" },
