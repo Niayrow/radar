@@ -6,34 +6,97 @@ const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://radarmeteo.sofianeweb.fr"),
-  title: "Aura Météo | Prévisions Interactives & Bento Grid",
-  description: "Suivez la météo en temps réel et heure par heure avec des prévisions ultra-précises (température, vent, UV, humidité) via une interface moderne et dynamique.",
-  keywords: ["météo", "prévisions météo", "aura météo", "météo heure par heure", "météo 10 jours", "application météo", "température", "pluie", "index uv"],
-  authors: [{ name: "Aura Météo" }],
+
+  // === TITLE (très important) ===
+  title: {
+    default: "Aura Météo | Prévisions Météo France en Temps Réel",
+    template: "%s | Aura Météo",
+  },
+
+  // === DESCRIPTION (optimisée ~155 caractères) ===
+  description: "Prévisions météo précises en France : température, vent, UV, humidité, pluie heure par heure et sur 10 jours. Interface moderne premium et application web installable (PWA).",
+
+  keywords: [
+    "météo france",
+    "prévisions météo",
+    "météo heure par heure",
+    "météo 10 jours",
+    "application météo",
+    "météo interactive",
+    "radar météo",
+    "température",
+    "pluie",
+    "indice uv",
+    "aura météo",
+  ],
+
+  authors: [{ name: "Aura Météo", url: "https://radarmeteo.sofianeweb.fr" }],
   creator: "Aura Météo",
   publisher: "Aura Météo",
-  robots: { index: true, follow: true },
+  category: "Weather",
+
+  // === ROBOTS (renforcé) ===
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-video-preview": -1,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+    },
+  },
+
+  // === CANONICAL ===
+  alternates: {
+    canonical: "/",
+  },
+
+  // === OPEN GRAPH (Social) ===
   openGraph: {
     type: "website",
     locale: "fr_FR",
     url: "https://radarmeteo.sofianeweb.fr",
-    title: "Aura Météo | Prévisions Interactives & Design Premium",
-    description: "Consultez la météo en direct de votre ville avec une interface moderne et dynamique. Températures, vent, UV et précipitations.",
+    title: "Aura Météo - Prévisions Météo Précises & Design Premium",
+    description: "L'application météo moderne pour la France. Consultez les prévisions en temps réel, heure par heure et sur 10 jours dans une interface ultra-design.",
     siteName: "Aura Météo",
+    images: [
+      {
+        url: "/og-image.png", // ← IMPORTANT : à créer (1200x630px)
+        width: 1200,
+        height: 630,
+        alt: "Aura Météo - Prévisions météo interactives et design premium",
+      },
+    ],
   },
+
+  // === TWITTER CARD ===
   twitter: {
     card: "summary_large_image",
-    title: "Aura Météo | Prévisions Interactives",
-    description: "La météo heure par heure et à 10 jours en temps réel dans une application web (PWA) ultra-design.",
+    title: "Aura Météo | Prévisions Météo Interactives en France",
+    description: "Météo heure par heure et à 10 jours en temps réel. Design premium, PWA installable.",
+    images: ["/og-image.png"],
+    creator: "@tonhandle", // ← à modifier avec ton vrai handle
   },
+
   manifest: "/manifest.json",
+
   appleWebApp: {
     capable: true,
     statusBarStyle: "black-translucent",
     title: "Aura Météo",
   },
+
+  // === ICÔNES (complètes) ===
   icons: {
+    icon: [
+      { url: "/favicon.ico" },
+      { url: "/icon-192.png", sizes: "192x192", type: "image/png" },
+      { url: "/icon-512.png", sizes: "512x512", type: "image/png" },
+    ],
     apple: "/icon-192.png",
+    shortcut: "/favicon.ico",
   },
 };
 
