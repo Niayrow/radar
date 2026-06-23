@@ -1,33 +1,261 @@
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
+/* ============================================================
+   ROOT DESIGN TOKENS
+   ============================================================ */
 :root {
-  --foreground-rgb: 0, 0, 0;
-  --background-start-rgb: 214, 219, 220;
-  --background-end-rgb: 255, 255, 255;
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --foreground-rgb: 255, 255, 255;
-    --background-start-rgb: 0, 0, 0;
-    --background-end-rgb: 0, 0, 0;
-  }
+  --card-radius: 20px;
+  --font-main: 'Outfit', system-ui, sans-serif;
 }
 
 body {
-  color: rgb(var(--foreground-rgb));
-  background: linear-gradient(
-      to bottom,
-      transparent,
-      rgb(var(--background-end-rgb))
-    )
-    rgb(var(--background-start-rgb));
+  color: #ffffff;
+  background-color: #07080f;
+  min-height: 100vh;
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden;
+  font-family: var(--font-main);
+  -webkit-font-smoothing: antialiased;
 }
 
-@layer utilities {
-  .text-balance {
-    text-wrap: balance;
-  }
+/* ============================================================
+   SCROLLBAR
+   ============================================================ */
+.custom-scrollbar::-webkit-scrollbar { height: 5px; }
+.custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: rgba(255,255,255,0.12);
+  border-radius: 9999px;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: rgba(255,255,255,0.28);
+}
+
+/* ============================================================
+   WEATHER PARTICLES — RAIN
+   ============================================================ */
+.rain-drop {
+  position: absolute;
+  background: linear-gradient(transparent, #67e8f9);
+  width: 1.5px;
+  height: 80px;
+  opacity: 0.55;
+  animation: rain-fall linear infinite;
+  pointer-events: none;
+}
+@keyframes rain-fall {
+  0%   { transform: translateY(-120px) skewX(-12deg); }
+  100% { transform: translateY(110vh) skewX(-12deg); }
+}
+
+/* ============================================================
+   WEATHER PARTICLES — SNOW
+   ============================================================ */
+.snowflake {
+  position: absolute;
+  background: rgba(255,255,255,0.9);
+  border-radius: 50%;
+  box-shadow: 0 0 6px rgba(186,230,253,0.8);
+  animation: snow-fall linear infinite;
+  pointer-events: none;
+}
+@keyframes snow-fall {
+  0%   { transform: translateY(-20px) translateX(0) rotate(0deg); opacity: 0.9; }
+  50%  { transform: translateY(50vh) translateX(35px) rotate(200deg); opacity: 0.75; }
+  100% { transform: translateY(102vh) translateX(-45px) rotate(400deg); opacity: 0; }
+}
+
+/* ============================================================
+   WEATHER PARTICLES — WARM SUN ORBS
+   ============================================================ */
+.warm-particle {
+  position: absolute;
+  background: radial-gradient(circle, rgba(251,191,36,0.35) 0%, rgba(239,68,68,0) 72%);
+  border-radius: 50%;
+  animation: float-warm ease-in-out infinite;
+  pointer-events: none;
+}
+@keyframes float-warm {
+  0%, 100% { transform: translateY(0) scale(1);     opacity: 0.2; }
+  50%       { transform: translateY(-28px) scale(1.14); opacity: 0.5; }
+}
+
+/* ============================================================
+   BACKGROUND LIQUID BLOBS
+   ============================================================ */
+.bg-blob {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(110px);
+  mix-blend-mode: plus-lighter;
+  animation: blob-drift 20s ease-in-out infinite;
+  pointer-events: none;
+}
+.bg-blob-2 {
+  animation: blob-drift-rev 27s ease-in-out infinite;
+}
+@keyframes blob-drift {
+  0%, 100% { transform: translate(0,   0)    scale(1);    }
+  33%       { transform: translate(70px, -70px) scale(1.18); }
+  66%       { transform: translate(-50px, 55px) scale(0.82); }
+}
+@keyframes blob-drift-rev {
+  0%, 100% { transform: translate(0,   0)    scale(1);    }
+  33%       { transform: translate(-70px, 70px) scale(0.82); }
+  66%       { transform: translate(55px, -50px) scale(1.18); }
+}
+
+/* ============================================================
+   MISC MICRO-ANIMATIONS
+   ============================================================ */
+.animate-bounce-subtle {
+  animation: bounce-subtle 3.5s ease-in-out infinite;
+}
+@keyframes bounce-subtle {
+  0%, 100% { transform: translateY(0)    rotate(0deg);  }
+  50%       { transform: translateY(-9px) rotate(3deg);  }
+}
+
+/* Pulsing neon ring for current icon */
+.animate-pulse-glow {
+  animation: pulse-glow 2.5s ease-in-out infinite;
+}
+@keyframes pulse-glow {
+  0%, 100% { box-shadow: 0 0 20px 4px rgba(255,255,255,0.1); }
+  50%       { box-shadow: 0 0 40px 10px rgba(255,255,255,0.25); }
+}
+
+/* Shimmer on card hover */
+@keyframes shimmer {
+  0%   { background-position: -200% center; }
+  100% { background-position:  200% center; }
+}
+
+/* ============================================================
+   GLASS BORDER — UNIVERSAL BASE
+   Each card gets a subtle gradient inset border that lights up.
+   ============================================================ */
+.glass-border-hover {
+  position: relative;
+  isolation: isolate;
+}
+.glass-border-hover::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1px;
+  background: linear-gradient(
+    135deg,
+    rgba(255,255,255,0.18) 0%,
+    rgba(255,255,255,0.04) 50%,
+    rgba(255,255,255,0.14) 100%
+  );
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
+  opacity: 0.6;
+  transition: opacity 0.4s ease;
+  z-index: -1;
+}
+.glass-border-hover:hover::before {
+  opacity: 1;
+  background: linear-gradient(
+    135deg,
+    rgba(255,255,255,0.45) 0%,
+    rgba(255,255,255,0.08) 50%,
+    rgba(255,255,255,0.38) 100%
+  );
+}
+
+/* ============================================================
+   THEMED GLASS CARDS — SUNNY 🌞
+   Orange → Rose → Violet neon glow
+   ============================================================ */
+.glass-card-sunny {
+  border: 1px solid rgba(251, 146, 60, 0.30) !important;
+  box-shadow:
+    0 4px 24px rgba(249, 115, 22, 0.18),
+    0 1px 0   rgba(255,255,255,0.10) inset !important;
+  transition: border-color 0.3s, box-shadow 0.3s;
+}
+.glass-card-sunny:hover {
+  border-color: rgba(251, 146, 60, 0.65) !important;
+  box-shadow:
+    0 8px 40px rgba(249, 115, 22, 0.35),
+    0 0   20px rgba(244, 63,  94, 0.20),
+    0 1px 0   rgba(255,255,255,0.18) inset !important;
+}
+
+/* ============================================================
+   THEMED GLASS CARDS — RAIN 🌧
+   Electric cyan / indigo glow
+   ============================================================ */
+.glass-card-rain {
+  border: 1px solid rgba(34, 211, 238, 0.25) !important;
+  box-shadow:
+    0 4px 24px rgba(6, 182, 212, 0.15),
+    0 1px 0   rgba(255,255,255,0.08) inset !important;
+  transition: border-color 0.3s, box-shadow 0.3s;
+}
+.glass-card-rain:hover {
+  border-color: rgba(34, 211, 238, 0.60) !important;
+  box-shadow:
+    0 8px 40px rgba(6, 182, 212, 0.32),
+    0 0   18px rgba(99, 102, 241, 0.22),
+    0 1px 0   rgba(255,255,255,0.16) inset !important;
+}
+
+/* ============================================================
+   THEMED GLASS CARDS — CLOUDY ☁️
+   Violet → fuchsia glow
+   ============================================================ */
+.glass-card-cloudy {
+  border: 1px solid rgba(192, 132, 252, 0.28) !important;
+  box-shadow:
+    0 4px 24px rgba(168, 85, 247, 0.14),
+    0 1px 0   rgba(255,255,255,0.08) inset !important;
+  transition: border-color 0.3s, box-shadow 0.3s;
+}
+.glass-card-cloudy:hover {
+  border-color: rgba(192, 132, 252, 0.60) !important;
+  box-shadow:
+    0 8px 40px rgba(168, 85, 247, 0.30),
+    0 0   18px rgba(236, 72, 153, 0.18),
+    0 1px 0   rgba(255,255,255,0.16) inset !important;
+}
+
+/* ============================================================
+   THEMED GLASS CARDS — COLD ❄️
+   Arctic teal / sky-blue glow
+   ============================================================ */
+.glass-card-cold {
+  border: 1px solid rgba(125, 211, 252, 0.30) !important;
+  box-shadow:
+    0 4px 24px rgba(14, 165, 233, 0.16),
+    0 1px 0   rgba(255,255,255,0.10) inset !important;
+  transition: border-color 0.3s, box-shadow 0.3s;
+}
+.glass-card-cold:hover {
+  border-color: rgba(125, 211, 252, 0.65) !important;
+  box-shadow:
+    0 8px 40px rgba(14, 165, 233, 0.32),
+    0 0   18px rgba(99, 225, 226, 0.22),
+    0 1px 0   rgba(255,255,255,0.18) inset !important;
+}
+
+/* ============================================================
+   BOTTOM NAV ACTIVE INDICATOR DOT
+   ============================================================ */
+.nav-active-dot {
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  margin: 0 auto;
 }
