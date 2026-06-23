@@ -378,7 +378,7 @@ export default function WeatherDashboard() {
   };
 
   return (
-    <div className="min-h-screen w-full relative overflow-y-auto p-4 md:p-8 flex flex-col items-center z-0 pb-28">
+    <div className="min-h-screen w-full relative overflow-y-auto p-4 md:p-8 flex flex-col items-center z-0 pb-36">
       {/* 1. Dynamic Animated Background Cross-Fade */}
       <AnimatePresence>
         <motion.div
@@ -959,35 +959,48 @@ export default function WeatherDashboard() {
         })()}
       </AnimatePresence>
 
-      {/* 5. Floating Bottom Navigation Bar (Fixed on Mobile, In-flow on PC) */}
-      <div className="fixed bottom-4 left-1/2 -translate-x-1/2 w-[calc(100%-2rem)] max-w-md bg-black/50 border border-white/[0.08] backdrop-blur-3xl rounded-2xl py-3 px-6 shadow-[0_20px_60px_rgba(0,0,0,0.6)] flex items-center justify-around z-50 md:relative md:bottom-0 md:left-0 md:translate-x-0 md:w-full md:mt-8 md:mb-2 md:z-10">
-        {([
-          { id: "today",    icon: Home,     label: "Aujourd'hui" },
-          { id: "forecast", icon: Calendar,  label: "Prévisions" },
-          { id: "map",      icon: Map,       label: "Carte" },
-        ] as { id: "today"|"forecast"|"map", icon: any, label: string }[]).map(({ id, icon: Icon, label }) => {
-          const isActive = activeTab === id;
-          return (
-            <button
-              key={id}
-              onClick={() => setActiveTab(id)}
-              className={`flex flex-col items-center gap-1 transition-all duration-200 active:scale-90 ${
-                isActive ? "scale-105" : "opacity-50 hover:opacity-80"
-              }`}
-            >
-              <div className={`p-2 rounded-xl transition-all duration-300 ${
-                isActive
-                  ? `bg-gradient-to-br ${theme.bgGradient} shadow-[0_4px_16px_rgba(0,0,0,0.4)]`
-                  : "bg-transparent"
-              }`}>
-                <Icon className={`w-5 h-5 ${ isActive ? "text-white" : "text-white/60" }`} />
-              </div>
-              <span className={`text-[9px] font-black tracking-wide ${ isActive ? "text-white" : "text-white/40" }`}>
-                {label}
-              </span>
-            </button>
-          );
-        })}
+      {/* 5. Floating Bottom Navigation Bar + Copyright (Fixed on Mobile, In-flow on PC) */}
+      <div className="fixed bottom-3 left-1/2 -translate-x-1/2 w-full max-w-md flex flex-col items-center gap-2 z-50 md:relative md:bottom-0 md:left-0 md:translate-x-0 md:mt-8 md:mb-2 md:z-10 px-4">
+        <div className="w-full bg-black/50 border border-white/[0.08] backdrop-blur-3xl rounded-2xl py-3 px-6 shadow-[0_20px_60px_rgba(0,0,0,0.6)] flex items-center justify-around">
+          {([
+            { id: "today",    icon: Home,     label: "Aujourd'hui" },
+            { id: "forecast", icon: Calendar,  label: "Prévisions" },
+            { id: "map",      icon: Map,       label: "Carte" },
+          ] as { id: "today"|"forecast"|"map", icon: any, label: string }[]).map(({ id, icon: Icon, label }) => {
+            const isActive = activeTab === id;
+            return (
+              <button
+                key={id}
+                onClick={() => setActiveTab(id)}
+                className={`flex flex-col items-center gap-1 transition-all duration-200 active:scale-90 ${
+                  isActive ? "scale-105" : "opacity-50 hover:opacity-80"
+                }`}
+              >
+                <div className={`p-2 rounded-xl transition-all duration-300 ${
+                  isActive
+                    ? `bg-gradient-to-br ${theme.bgGradient} shadow-[0_4px_16px_rgba(0,0,0,0.4)]`
+                    : "bg-transparent"
+                }`}>
+                  <Icon className={`w-5 h-5 ${ isActive ? "text-white" : "text-white/60" }`} />
+                </div>
+                <span className={`text-[9px] font-black tracking-wide ${ isActive ? "text-white" : "text-white/40" }`}>
+                  {label}
+                </span>
+              </button>
+            );
+          })}
+        </div>
+        <p className="text-[10px] text-white/30 font-medium tracking-wide">
+          © {new Date().getFullYear()} — Créé par{" "}
+          <a
+            href="https://sofianeweb.fr"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-white/50 hover:text-white/80 transition-colors underline-offset-2 hover:underline"
+          >
+            sofianeweb.fr
+          </a>
+        </p>
       </div>
     </div>
   );

@@ -1,8 +1,8 @@
 import WeatherDashboard from "../components/WeatherDashboard";
 
 export const metadata = {
-  title: "Aura Météo - Prévisions Interactives Heure par Heure",
-  description: "Découvrez vos prévisions météo heure par heure avec une interface Bento Grid & Glassmorphism ultra-dynamique, changeant de couleur en temps réel.",
+  title: "Aura Météo - La Météo Heure par Heure & Prévisions à 10 Jours",
+  description: "Découvrez vos prévisions météo complètes : météo heure par heure, à 10 jours, qualité de l'air, vent et UV. Interface fluide, dynamique et ultra-précise.",
 };
 
 export default function Home() {
